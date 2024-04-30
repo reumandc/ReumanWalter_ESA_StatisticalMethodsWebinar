@@ -1,7 +1,7 @@
 # wsyn: Wavelet approaches to studies of synchrony in ecology - introduction to the repository of codes supporting the talk
 
 Daniel C. Reuman, University of Kansas, reuman@ku.edu  
-Jonathan Walter, University of Virginia, jawalter@ucdavis.edu  
+Jonathan Walter, University of California Davis, jawalter@ucdavis.edu  
 
 ## Introduction
 
@@ -34,8 +34,8 @@ R, R studio, a setup that can compile beamer latex documents. The right versions
 
 ### Dependencies on R, R studio
 
-Dan used R version 4.3.0 running on Ubuntu 18.04, and R studio version 2023.03.0+386. 
-Jon used <Jon fill in your info here>
+Dan used R version 4.3.0 running on Ubuntu 18.04, and RStudio version 2023.03.0+386. 
+Jon used R version 4.2.1 running on MacOS 12.7.4 and RStudio version 2023.09.1+494.
 
 ### Package versions
 
@@ -45,7 +45,7 @@ Dan:
 wsyn, version 1.0.4;
 
 Jon:
-<Jon fill in yoru packages here>
+wsyn, version 1.0.4;
 
 You may have to install the versions of R, R studio, and the packages listed above to get the code to
 run if a lot of time has passed since the talk. 
