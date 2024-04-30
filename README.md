@@ -1,4 +1,4 @@
-#wsyn: Wavelet approaches to studies of synchrony in ecology - introduction to the repository of codes supporting the talk
+# wsyn: Wavelet approaches to studies of synchrony in ecology - introduction to the repository of codes supporting the talk
 
 Daniel C. Reuman, University of Kansas, reuman@ku.edu  
 Jonathan Walter, University of Virginia, jawalter@ucdavis.edu  

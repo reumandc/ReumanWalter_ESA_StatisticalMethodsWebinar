@@ -85,6 +85,16 @@ May, 2024
 
 \section{Introduction}
 
+%In this Intro, we probably better put some of the caveating and provisors and citations
+%we are presently putting into our review. This is not the only way to consider timescale
+%specificity of synchrony, there is lots of other work on the subject, would be good
+%to respect some of that work before going on with our way of doing it. 
+%Maybe could have an example from an old Fourier paper (not even looking at synchrony) - timescale-specific methods have been used in ecology forever
+%Maybe have an example of a "precursor study" or two where you can see they are talking about timescale-specific things. And maybe also changes through time (mention a couple early papers showing changes in synchrony). 
+%Through decades of work by many researchers, the field has matured, helped at every stage by 1) long time series, and 2) ever improving statistical methods. This is one reasonably complete suite of such methods, but other authors use variant methods and so on which are also good and also allow us to learn about ecosystems.
+%And the methods all overlap, being based on now-standard standard wavelet tools, differing in details we won't go into 
+%Mention some of the other authors. 
+%Our way of thinking about methods has been implemented in wsyn
 
 \section{wsyn and synthetic examples}
 
@@ -300,7 +310,19 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Benefits of a timescale-specific approach to synchrony so far}
+\begin{itemize}
+\item The example shows some benefits to a time/timescale-specific approach over classic correlation-based methods
+\item Correlation methods did not show synchrony, since those methods conflate timescales and averaged across time
+\item We can see the synchrony and see its structure
+\item It turns out that timescale structure is very common in synchrony
+\item It turns out that changes through time are also common, and a consequence of climate change
+\end{itemize}
+\end{frame}
+
 \subsection{Wavelet coherence}
+
 
 
 \subsection{Attributing synchrony to causes}

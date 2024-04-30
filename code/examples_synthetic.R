@@ -82,4 +82,9 @@ wpmfres<-wsyn::wpmf(dat,times,sigmethod="quick")
 grDevices::pdf(file=paste0(resloc,"WPMFExample_wpmf.pdf"))
 wsyn::plotmag(wpmfres,sigthresh=0.95)
 grDevices::dev.off()
+#you can see what we know is there because we built it in, so this demonstrates the utility of the method
+
+#***wavelet coherence
+
+
 
