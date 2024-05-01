@@ -3,8 +3,6 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{amsmath}
-\usepackage{lmodern}
-\usepackage[T1]{fontenc}
 
 \usetheme{Darmstadt}
 \usefonttheme[onlylarge]{structurebold}
@@ -15,6 +13,9 @@
 \usetikzlibrary{arrows,shapes}
 \usetikzlibrary{calc,decorations.pathmorphing,patterns}
 \tikzstyle{block}=[draw opacity=0.7,line width=1.4cm]
+
+\definecolor{lightpink}{rgb}{.96,.86,.86}
+\definecolor{lightgreen}{rgb}{.86,.96,.86}
 
 %I got the next chunk here https://tex.stackexchange.com/questions/109159/crossing-out-whole-slide-with-latex-beamer as a 
 %solution for putting a big x across the whole slide
@@ -116,16 +117,15 @@ May, 2024
 
 \subsection{Wavelet transform}
 
+{\setbeamercolor{background canvas}{bg=lightpink}
 \begin{frame}
 \frametitle{The wavelet transform}
 \begin{itemize}
 \item All the tools we discuss today are based on the wavelet transform
 \item So we start by introducing it
-\item Data are one time series
-\item As for all the tools we introduce today, we provide an operational understanding
-\item Very light on the mathematics
+\item Data consist of one time series
 \end{itemize}
-\end{frame}
+\end{frame}}
 
 \begin{frame}
 \frametitle{How to use the wavelet transform}
@@ -205,17 +205,28 @@ wsyn::plotphase(wtres)
 \end{columns}
 \end{frame}
 
-\subsection{Ways to show time and timescale structure of synchrony}
+{\setbeamercolor{background canvas}{bg=lightgreen}
+\begin{frame}
+\frametitle{Advantages of the wavelet transform}
+\begin{itemize}
+\item Not only shows how the overall variability of the time series decomposes by timescale...
+\item Also shows how that changes through time
+\end{itemize}
+\end{frame}}
 
+\subsection{Time and timescale structure of synchrony}
+
+{\setbeamercolor{background canvas}{bg=lightpink}
 \begin{frame}
 \frametitle{Displaying how synchrony depends on time and timescale}
 \begin{itemize}
 \item This talk covers an approach to exploring how synchrony depends on timescale...
 \item and how it changes through time
 \item So we next introduce methods for displaying the time and timescale structure of synchrony
-\item Data are multiple time series from different locations
+based on the wavelet transform
+\item Data now consist of multiple time series from different locations
 \end{itemize}
-\end{frame}
+\end{frame}}
 
 \begin{frame}
 \frametitle{The wavelet phasor mean field (\texttt{wsyn::wpmf})}
@@ -333,6 +344,7 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
   \end{itemize}
 \end{frame}
 
+{\setbeamercolor{background canvas}{bg=lightgreen}
 \begin{frame}
 \frametitle{Benefits of a timescale-specific approach to synchrony so far}
 \begin{itemize}
@@ -343,18 +355,22 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
 \item It turns out that timescale structure is very common in synchrony
 \item It turns out that changes through time are also common, and a consequence of climate change
 \end{itemize}
-\end{frame}
+\end{frame}}
 
 \subsection{Wavelet coherence}
 
+{\setbeamercolor{background canvas}{bg=lightpink}
 \begin{frame}
 \frametitle{Starting to explore causes of synchrony}
 \begin{itemize}
 \item We know that one important cause of synchrony is the Moran effect
 \item How do we start to explore that in a time/timescale-specific viewpoint?
+\item We need to understand relationships between two sets of time series measured in the same places
+(usually one environmental and one biological)
+\item So data now consist of two sets of time series measured at the same times and places
 \item Our approach is based on ``wavelet coherence''
 \end{itemize}
-\end{frame}
+\end{frame}}
 
 \begin{frame}
 \frametitle{The basic idea of wavelet coherence, by analogy}
@@ -446,9 +462,9 @@ y<-y+matrix(rnorm(11*lt,mean=0,sd=3),11,lt)
 \frametitle{Example of spatial coherence: apply \texttt{wsyn::coh}}
 \begin{exampleblock}{Apply \texttt{coh}}
 \begin{verbatim}
-cohres<-wsyn::coh(dat1=x,dat2=y,times=times,norm="powall",
-         sigmethod="fftsurrog1",nrand=1000,
-         f0=0.5,scale.max.input=28)
+cohres<-wsyn::coh(dat1=x,dat2=y,times=times,
+  norm="powall",sigmethod="fftsurrog1",
+  nrand=1000,f0=0.5,scale.max.input=28)
 \end{verbatim}
 \end{exampleblock}
 \begin{block}{Notes}
@@ -500,20 +516,157 @@ cohres<-wsyn::coh(dat1=x,dat2=y,times=times,norm="powall",
 \begin{columns}[c]
 \begin{column}{6cm}
 \begin{itemize}
+\item You can also get the rank of the coherence compared to surrogate coherences
+\item The timescales where this exceed the threshold are ``significant''
+\item Keep in mind multiple-testing errors though
+\end{itemize}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_PlotRanks.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of coherence: what do you get?}
+\begin{columns}[c]
+\begin{column}{4cm}
+\begin{itemize}
 \item \texttt{wsyn} can also compute $p$-values for particular timescale bands
+\item Here we consider the timescale bands 2-4 and 8-12
 \item This can help address multiple testing problems
 \item See vignette for details
 \end{itemize}
 \end{column}
-\begin{column}{6cm}
+\begin{column}{8cm}
 \includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_PlotCoh2.pdf}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}
+\frametitle{Technical slide: Significance - what are these surrogates I mentioned?}
+\begin{itemize}
+\item Given data $x_n(t)$, $y_n(t)$, $n=1,\ldots,N$, $t=1,\ldots,T$
+\item Compute the spatial wavelet coherence (a function of frequency/timescale)
+\item Compute surrogates $x'_n(t)$, recompute spatial wavelet coherence for the surrogates
+\item Repeat 10000 or so times
+\item Compare coherence plot using data to the distribution of plots using surrogates
+\end{itemize}
+\end{frame}
 
+\begin{frame}
+\frametitle{Technical slide: Significance - what are these surrogates I mentioned?}
+\begin{itemize}
+\item Surrogates $x'_n(t)$ should have the same spatial and temporal autocorrelation properties as $x_n(t)$, but be unrelated to $y_n(t)$
+\item How to get them (concept)
+\begin{itemize}
+\item Fourier transform all $x_n(t)$
+\item Randomize the phases of the transforms, uses the same randomizations for all $n$
+\item Reverse transform to get $x'_n(t)$
+\end{itemize}
+\item We have a fast algorithm: Sheppard et al (2017, EPJ, Nonlin Biomed Phys)
+\end{itemize}
+\end{frame}
+
+{\setbeamercolor{background canvas}{bg=lightgreen}
+\begin{frame}
+\frametitle{Advantages of the timescale specific approach}
+\begin{itemize}
+\item Time series can be related to each other on some timescales and not on others
+\item E.g., if moving average processes are what make them related
+\item If you look for correlations, you might not see the relationship - lack of relationship on other timescales obscures the relationship that does occur on certain timescales
+\item Coherence can fix that problem
+\item Timescale specific relationships should be common in biology
+\end{itemize}
+\end{frame}}
 
 \subsection{Attributing synchrony to causes}
+
+{\setbeamercolor{background canvas}{bg=lightpink}
+\begin{frame}
+\frametitle{OK, how do we get from here to saying something about environmental causes of synchrony?}
+\begin{itemize}
+\item How does coherence relate to possible causative relationships?
+\item How do we attribute synchrony to particular causes? 
+\item What about interactions between causes?
+\end{itemize}
+\end{frame}}
+
+\begin{frame}
+\frametitle{Coherence can gives you information about causes of synchrony}
+\begin{itemize}
+\item Making claims about causes from observational data is fraught, but there are already several statistical frameworks for doing it
+\item Our framework gives another that applies to environmental causes of synchrony
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Coherence can gives you information about causes of synchrony}
+\begin{itemize}
+\item If A is an environmental variable and B is a population variable, and A and B are highly significantly
+coherent on a certain timescale band, then, logically, EITHER...
+\begin{itemize}
+\item A is driving B on that band, possibly indirectly OR
+\item B is driving A on that band (very unlikely in this context) OR
+\item They are mutually influencing each other (B-to-A influence very unlikely) OR
+\item Some third variable C is driving both, or driving B and mutually related to A
+\end{itemize}
+\item In that case C is very likely another environmental variable
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Coherence can gives you information about causes of synchrony}
+\begin{itemize}
+\item So if A is an environmental variable and B is a population variable...
+\item and A and B are highly significantly coherent on a certain timescale band...
+\item and if A is synchronous...
+\item Then we can reasonably claim to have identified a Moran effect
+\item Can we then quantify how much synchrony in B is explained by synchrony in A?
+\item Yes! 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Some analytic frameworks}
+\begin{itemize}
+\item Based on what I showed you, and for the purpose of understanding environmental drivers of synchrony...
+\item We developed a wavelet linear modeling framework
+\item And a ``wavelet Moran theorem'' and ``synchrony attribution theorem''
+\item See Sheppard et al (2016), Nature Climate Change
+\item And Sheppard et al (2019), Plos Comp Biol
+\item And the vignette
+\item I want to demo these tools with made-up data before Jon applies them
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The data: environmental}
+\begin{itemize}
+\item Everything is in 10 locations
+\item Environmental variable 1, d1
+\begin{itemize}
+\item an oscillation of period $12$ years and an oscillation of period $3$ years 
+\item and strong white noise
+\end{itemize}
+\item Environmental variable 2, d2, was the same structure, but independently generated
+\item Environmental variable 3, dirrel, was white noise only
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The data: populations}
+\begin{itemize}
+\item The population in each location is influenced by the two drivers...
+\item And by separate, independent local variability
+\item Driver 1 is averaged over 3 time steps in its influence, so
+only the period-12 variability in driver 1 influences the populations
+\item Driver 2 influences populations directly
+\item dirrel has no influence (hence the name)
+\item If we did not know the setup and wanted to infer causes of synchrony, could we do it?
+\end{itemize}
+\end{frame}
 
 
 

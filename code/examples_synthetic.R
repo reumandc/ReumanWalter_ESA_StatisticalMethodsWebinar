@@ -133,6 +133,10 @@ grDevices::pdf(file=paste0(resloc,"CoherenceExample_PlotCoh1.pdf"))
 wsyn::plotmag(cohres)
 grDevices::dev.off()
 
+grDevices::pdf(file=paste0(resloc,"CoherenceExample_PlotRanks.pdf"))
+wsyn::plotrank(cohres)
+grDevices::dev.off()
+
 #now add p-values for a couple bands
 cohres<-wsyn::bandtest(cohres,c(8,12))
 cohres<-wsyn::bandtest(cohres,c(2,4))
@@ -141,3 +145,126 @@ cohres<-wsyn::bandtest(cohres,c(2,4))
 grDevices::pdf(file=paste0(resloc,"CoherenceExample_PlotCoh2.pdf"))
 wsyn::plotmag(cohres)
 grDevices::dev.off()
+
+#***wavelet linear model example
+
+set.seed(3221) 
+
+#First create a diver variable composed of an oscillation of period $12$ years and
+#an oscillation of period $3$ years, and normally
+#distributed white noise of mean $0$ and standard deviation $1.5$.
+lts<-12
+sts<-3
+mats<-3
+times<-seq(from=-mats,to=100)
+ts1<-sin(2*pi*times/lts)
+ts2<-sin(2*pi*times/sts)
+numlocs<-10
+d1<-matrix(NA,numlocs,length(times)) #the first driver
+for (counter in 1:numlocs)
+{
+  d1[counter,]<-ts1+ts2+rnorm(length(times),mean=0,sd=1.5)
+}
+
+#Next create a second driver, again composed of an oscillation of period $12$ years and
+#an oscillation of period $3$ years, and normally
+#distributed white noise of mean $0$ and standard deviation $1.5$.
+ts1<-sin(2*pi*times/lts)
+ts2<-sin(2*pi*times/sts)
+d2<-matrix(NA,numlocs,length(times)) #the second driver
+for (counter in 1:numlocs)
+{
+  d2[counter,]<-ts1+ts2+rnorm(length(times),mean=0,sd=1.5)
+}
+
+#Next create an irrelevant environmental variable. With real data, of course,
+#one will not necessarily know in advance whether an environmental
+#variable is irrelevant to a population system. But, for the purpose of 
+#demonstrating the methods, we are playing the dual role of data creator and 
+#analyst.
+dirrel<-matrix(NA,numlocs,length(times)) #the irrelevant env var
+for (counter in 1:numlocs)
+{
+  dirrel[counter,]<-rnorm(length(times),mean=0,sd=1.5)
+}
+
+#The population in each location is a combination of the two drivers,
+#plus local variability. Driver 1 is averaged over 3 time steps
+#in its influence on the populations, so
+#only the period-12 variability in driver 1 influences the populations. 
+pops<-matrix(NA,numlocs,length(times)) #the populations
+for (counter in (mats+1):length(times))
+{
+  aff1<-apply(FUN=mean,X=d1[,(counter-mats):(counter-1)],MARGIN=1)
+  aff2<-d2[,counter-1]
+  pops[,counter]<-aff1+aff2+rnorm(numlocs,mean=0,sd=3)
+}
+pops<-pops[,times>=0]
+d1<-d1[,times>=0]
+d2<-d2[,times>=0]
+dirrel<-dirrel[,times>=0]
+times<-times[times>=0]
+
+#If only the data were available and we were unaware of how they were generated,
+#we may want to infer the causes of synchrony and its timescale-specific patterns 
+#in the populations.   
+#Start by fitting a model with all three predictors. 
+dat<-list(pops=pops,d1=d1,d2=d2,dirrel=dirrel)
+dat<-lapply(FUN=function(x){wsyn::cleandat(x,times,1)$cdat},X=dat) #prep data for call to wlm
+wlm_all<-wsyn::wlm(dat,times,resp=1,pred=2:4,norm="powall",scale.max.input=28)
+
+#We will carry out analyses for this model at long timescales 
+#($11$ to $13$ years) and short timescales 
+#($2$ to $4$ years) simultaneously. First test whether we can drop each variable.
+wlm_all_dropi<-wsyn::wlmtest(wlm_all,drop="dirrel",sigmethod="fft",nrand=100) #few randomizations for speed, but in real life use at least 1000
+wlm_all_drop1<-wsyn::wlmtest(wlm_all,drop="d1",sigmethod="fft",nrand=100)
+wlm_all_drop2<-wsyn::wlmtest(wlm_all,drop="d2",sigmethod="fft",nrand=100)
+
+#the two timescale bands we will use
+blong<-c(11,13)
+bshort<-c(2,4)
+
+#tests for whether we can drop dirrel
+wlm_all_dropi<-wsyn::bandtest(wlm_all_dropi,band=blong)
+wlm_all_dropi<-wsyn::bandtest(wlm_all_dropi,band=bshort)
+
+#display/save results
+grDevices::pdf(file=paste0(resloc,"WLM_example_DropIrrel.pdf"))
+wsyn::plotrank(wlm_all_dropi)
+grDevices::dev.off()
+
+#tests for whether we can drop d1
+wlm_all_drop1<-wsyn::bandtest(wlm_all_drop1,band=blong)
+wlm_all_drop1<-wsyn::bandtest(wlm_all_drop1,band=bshort)
+
+#display/save results
+grDevices::pdf(file=paste0(resloc,"WLM_example_Drop1.pdf"))
+wsyn::plotrank(wlm_all_drop1)
+grDevices::dev.off()
+
+#tests for whether we can drop d2
+wlm_all_drop2<-wsyn::bandtest(wlm_all_drop2,band=blong)
+wlm_all_drop2<-wsyn::bandtest(wlm_all_drop2,band=bshort)
+
+#display/save results
+grDevices::pdf(file=paste0(resloc,"WLM_example_Drop2.pdf"))
+wsyn::plotrank(wlm_all_drop2)
+grDevices::dev.off()
+
+#it turns out we can drop dirrel on both bands, so do it, i.e., make a new model
+#where it's dropped
+wlm_good<-wsyn::wlm(dat,times,resp=1,pred=2:3,norm="powall",scale.max.input=28)
+
+#now look at how much synchrony is explained, short timescales
+se<-wsyn::syncexpl(wlm_good)
+se_short<-se[se$timescales>=bshort[1] & se$timescales<=bshort[2],]
+round(100*colMeans(se_short[,c(3:8)])/mean(se_short$sync),4)
+#almost all the synchrony that can be explained is explained by d1
+
+#now look at how much synchrony is explained, long timescales
+se_long<-se[se$timescales>=blong[1] & se$timescales<=blong[2],]
+round(100*colMeans(se_long[,c(3:8)])/mean(se_long$sync),4)
+#synchrony explained by d1, d2 and interactions
+
+
+
