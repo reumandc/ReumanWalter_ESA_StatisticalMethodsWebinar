@@ -48,14 +48,6 @@
 \newcommand{\mean}{{\operatorname{mean}}}
 \newcommand{\cosp}{{\operatorname{cosp}}}
 
-% ------------------------------------------------------------------------------
-% got this from here: https://www.overleaf.com/latex/examples/code-presentations-example-different-ways-shown-in-beamer-metropolis/tsxpnyjbhbds
-% ------------------------------------------------------------------------------
-%\let\textttorig\texttt
-%\renewcommand<>{\texttt}[1]{%
-%  \only#2{\textttorig{#1}}%
-%}
-
 \title[Wavelet approaches to synchrony]
 {
 wsyn: Wavelet approaches to studies of synchrony in ecology
@@ -624,7 +616,7 @@ coherent on a certain timescale band, then, logically, EITHER...
 \item and if A is synchronous...
 \item Then we can reasonably claim to have identified a Moran effect
 \item Can we then quantify how much synchrony in B is explained by synchrony in A?
-\item Yes! 
+\item Yes!
 \end{itemize}
 \end{frame}
 
@@ -638,16 +630,17 @@ coherent on a certain timescale band, then, logically, EITHER...
 \item And Sheppard et al (2019), Plos Comp Biol
 \item And the vignette
 \item I want to demo these tools with made-up data before Jon applies them
+\item They provide a reasonably comprehensive tool set for investigating environmental causes of synchrony
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{The data: environmental}
+\frametitle{The made-up data: environmental}
 \begin{itemize}
 \item Everything is in 10 locations
 \item Environmental variable 1, d1
 \begin{itemize}
-\item an oscillation of period $12$ years and an oscillation of period $3$ years 
+\item an oscillation of period $12$ years and an oscillation of period $3$ years
 \item and strong white noise
 \end{itemize}
 \item Environmental variable 2, d2, was the same structure, but independently generated
@@ -656,7 +649,7 @@ coherent on a certain timescale band, then, logically, EITHER...
 \end{frame}
 
 \begin{frame}
-\frametitle{The data: populations}
+\frametitle{The made-up data: populations}
 \begin{itemize}
 \item The population in each location is influenced by the two drivers...
 \item And by separate, independent local variability
@@ -664,10 +657,22 @@ coherent on a certain timescale band, then, logically, EITHER...
 only the period-12 variability in driver 1 influences the populations
 \item Driver 2 influences populations directly
 \item dirrel has no influence (hence the name)
-\item If we did not know the setup and wanted to infer causes of synchrony, could we do it?
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{The goal}
+\begin{itemize}
+\item If we did not know the setup and only had the data, could we infer causes of synchrony?
+\item Because of how the data were constructed, we know:
+\begin{itemize}
+\item d1 is important for synchrony on long timescales (about 12 years)
+\item d2 is important for synchrony on both long (12 years) and short (3 years) timescales
+\item dirrel is not important for synchrony
+\end{itemize}
+\item Can we infer these facts if we only had the data?
+\end{itemize}
+\end{frame}
 
 
 \section{Kelp example}
@@ -678,7 +683,7 @@ Goals for the empirical example:
 \begin{itemize}
 \item Add concreteness through application to a real question
 \item Discuss some challenges posed by real-world data for application of methods
-
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -700,8 +705,8 @@ Walter, J.A., et al. (2024) Spatial synchrony cascades across ecosystems and up 
 Santa Barbara Coastal LTER, J. Dugan, SBC LTER: Beach: Time-series of beach wrack cover and biomass, ongoing since 2008 ver 16. Environmental Data Initiative (2021). \url{https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-sbc.40.16}.
 \end{block}
 \begin{block}{Kelp forest and wave data}
-T. Bell, SBC LTER: Reef: California kelp canopy and environmental variable dynamics ver 1. 
-Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c8629cfa3fbe80fdc9e086a9aa}. 
+T. Bell, SBC LTER: Reef: California kelp canopy and environmental variable dynamics ver 1.
+Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c8629cfa3fbe80fdc9e086a9aa}.
 \end{block}
 \end{frame}
 
@@ -711,6 +716,7 @@ Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c
 \item Analyses in \texttt{wsyn} require complete, regularly spaced time series
 \item Organize into site (beaches) by time (months, Jan. 200X to Dec. 20XX) matrices
 \item Fill any gaps with beach- and month-specific medians
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -719,6 +725,7 @@ Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c
 \item Avoid borrowing information from neighboring sites. This can build in artefactual synchrony.
 \item Be cautious with temporal structures---preserve things that have well-defined periods and consistent amplitudes, e.g., seasonal and diurnal cycles.
 \item It may be impossible to responsibly fill many/large gaps. We have generally avoided analyzing time series with more than 20\% or so missing values, when there are several consecutive missing values, and when many/all locations are missing data simultaneously.
+\end{itemize}
 \end{frame}
 
 \end{document}
