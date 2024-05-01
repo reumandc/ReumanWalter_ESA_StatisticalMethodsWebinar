@@ -3,6 +3,8 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
 
 \usetheme{Darmstadt}
 \usefonttheme[onlylarge]{structurebold}
@@ -115,6 +117,17 @@ May, 2024
 \subsection{Wavelet transform}
 
 \begin{frame}
+\frametitle{The wavelet transform}
+\begin{itemize}
+\item All the tools we discuss today are based on the wavelet transform
+\item So we start by introducing it
+\item Data are one time series
+\item As for all the tools we introduce today, we provide an operational understanding
+\item Very light on the mathematics
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{How to use the wavelet transform}
 \begin{itemize}
 \item Given a time series $x(t)$, the wavelet transform, $W_{\sigma}(t)$ is a complex number with:
@@ -192,7 +205,17 @@ wsyn::plotphase(wtres)
 \end{columns}
 \end{frame}
 
-\subsection{Two ways to show time- and timescale-specific synchrony}
+\subsection{Ways to show time and timescale structure of synchrony}
+
+\begin{frame}
+\frametitle{Displaying how synchrony depends on time and timescale}
+\begin{itemize}
+\item This talk covers an approach to exploring how synchrony depends on timescale...
+\item and how it changes through time
+\item So we next introduce methods for displaying the time and timescale structure of synchrony
+\item Data are multiple time series from different locations
+\end{itemize}
+\end{frame}
 
 \begin{frame}
 \frametitle{The wavelet phasor mean field (\texttt{wsyn::wpmf})}
@@ -279,7 +302,7 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
 \begin{column}{6cm}
 \begin{itemize}
 \item We get significant synchrony at timescale 10, initially, then at timescale 5
-\item So we detect the time- and timescale-specific synchrony what was built into the data
+\item So we detect the time- and timescale-specific synchrony that was built into the data
 \end{itemize}
 \end{column}
 \end{columns}
@@ -314,14 +337,179 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
 \frametitle{Benefits of a timescale-specific approach to synchrony so far}
 \begin{itemize}
 \item The example shows some benefits to a time/timescale-specific approach over classic correlation-based methods
-\item Correlation methods did not show synchrony, since those methods conflate timescales and averaged across time
-\item We can see the synchrony and see its structure
+\item Correlation methods did not show synchrony, since those methods conflated timescales and averaged across time
+\item Synchrony on some timescales was obscured by asynchrony on others
+\item We can now see the synchrony and see its structure
 \item It turns out that timescale structure is very common in synchrony
 \item It turns out that changes through time are also common, and a consequence of climate change
 \end{itemize}
 \end{frame}
 
 \subsection{Wavelet coherence}
+
+\begin{frame}
+\frametitle{Starting to explore causes of synchrony}
+\begin{itemize}
+\item We know that one important cause of synchrony is the Moran effect
+\item How do we start to explore that in a time/timescale-specific viewpoint?
+\item Our approach is based on ``wavelet coherence''
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The basic idea of wavelet coherence, by analogy}
+\begin{itemize}
+\item Our method will 
+\begin{itemize}
+\item quantify the consistency of the phase relationship between signals, through space and time
+\item and compare that to what would be expected if the signals were unrelated but each had the same degree of phase drift across space and time
+\end{itemize}
+\item It is the very irregularity of biological time series that makes this method work
+\item Clock analogy
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Spatial wavelet coherence}
+\begin{itemize}
+\item \texttt{wsyn} has a spatialized wavelet coherence tool to detect relationships between variables in a timescale-specific way
+\item $w_{n,\sigma}^{(1)}(t)$ and $w_{n,\sigma}^{(2)}(t)$ normalized wavelet transforms
+\item $w_{n,\sigma}^{(1)}(t) (w_{n,\sigma}^{(2)}(t))^{*}$ has phase equal to the phase difference
+\item $\frac{1 }{NT}\sum_{n= 1}^{N}\sum_{t=1}^{T} w_{n,\sigma}^{(1)}(t) (w_{n,\sigma}^{(2)}(t))^{*}$ measures consistency of phase differences across time and location 
+\item This sum is large when phase differences are consistent across space and time...
+\item and small when they are not consistent
+\item We compare against the same thing calculated for randomized ``surrogate'' datasets
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of spatial coherence tools: make some data}
+\begin{block}{Fake data characteristics: environmental data}
+\begin{itemize}
+\item Data consist of an environmental driver and a biological variable, both measured at $11$ locations
+\item The environmental variable is the sum of:
+\begin{itemize}
+\item a weak common signal, period $10$
+\item a strong common signal, period $3$
+\item white noise 
+\end{itemize}
+\end{itemize}
+\end{block}
+\begin{exampleblock}{Make the fake environmental data}
+\begin{verbatim}
+times<-(-3:100); lt<-length(times)
+ts1<-sin(2*pi*times/10)
+ts2<-5*sin(2*pi*times/3)
+x<-matrix(ts1+ts2,11,lt,byrow=TRUE)+
+  matrix(rnorm(11*lt,0,1.5),11,lt)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of spatial coherence tools: make some data}
+\begin{block}{Fake data characteristics: biological data}
+\begin{itemize}
+\item population time series were the 3-step moving average of the environment 
+\item plus white noise
+\end{itemize}
+\end{block}
+\begin{exampleblock}{Make the fake biological data}
+\begin{verbatim}
+times<-0:100; lt<-length(times)
+y<-matrix(NA,11,lt) #the driven (biological) variable
+for (i in 1:101) {
+  y[,i]<-apply(FUN=mean,X=x[,i:(i+2)],MARGIN=1) }
+y<-y+matrix(rnorm(11*lt,mean=0,sd=3),11,lt)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{Can you see the relationships here using ordinary correlation? Not really.}
+\begin{columns}[c]
+\begin{column}{5cm}
+\begin{itemize}
+\item For each location we computed the correlation between the biological and environmental time series
+\item This is a histogram of those values
+\item You can't really see any tendency toward correlation
+\item Why?
+\end{itemize}
+\end{column}
+\begin{column}{7cm}
+\includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_LocalBiolEnvCorrs.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of spatial coherence: apply \texttt{wsyn::coh}}
+\begin{exampleblock}{Apply \texttt{coh}}
+\begin{verbatim}
+cohres<-wsyn::coh(dat1=x,dat2=y,times=times,norm="powall",
+         sigmethod="fftsurrog1",nrand=1000,
+         f0=0.5,scale.max.input=28)
+\end{verbatim}
+\end{exampleblock}
+\begin{block}{Notes}
+\begin{itemize}
+\item \texttt{cohres} is an S3 class defined for holding coherence results
+\item \texttt{nrand} is the number of bootstrapped (surrogate) datasets to use
+\item see vignette for additional details
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of coherence: what do you get?}
+\begin{columns}[c]
+\begin{column}{6cm}
+\begin{itemize}
+\item Coherence between environmental and population data is the red line
+\item It is weak at short timescales (period 3) because of the moving average
+\item It is strong at long timescales
+\item Black lines are confidence thresholds based on surrogates, $95$ and $99\%$
+\end{itemize}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_PlotCoh1.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of coherence: what do you get?}
+\begin{columns}[c]
+\begin{column}{6cm}
+\begin{itemize}
+\item Even though the period-3 environmental oscillation is much stronger than the period-10 ...
+\item It does not influence the populations because of the averaging
+\item Pop-env relationship depends on timescale!
+\item You have to account for that if you want to detect it!
+\item This will also influence the potential for Moran effects
+\end{itemize}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_PlotCoh1.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example of coherence: what do you get?}
+\begin{columns}[c]
+\begin{column}{6cm}
+\begin{itemize}
+\item \texttt{wsyn} can also compute $p$-values for particular timescale bands
+\item This can help address multiple testing problems
+\item See vignette for details
+\end{itemize}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/synthetic_results/CoherenceExample_PlotCoh2.pdf}
+\end{column}
+\end{columns}
+\end{frame}
 
 
 

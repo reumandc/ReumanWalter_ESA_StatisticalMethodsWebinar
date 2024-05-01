@@ -86,5 +86,58 @@ grDevices::dev.off()
 
 #***wavelet coherence
 
+#make some environmental data, 2 superimposed sin waves in all locations and white noise
+times<-(-3:100); lt<-length(times)
+ts1<-sin(2*pi*times/10)
+ts2<-5*sin(2*pi*times/3)
+x<-matrix(ts1+ts2,11,lt,byrow=TRUE)+
+  matrix(rnorm(11*lt,0,1.5),11,lt)
 
+#make biological data - the population is a moving average of the environment plus white noise
+times<-0:100; lt<-length(times)
+y<-matrix(NA,11,lt) #the driven (biological) variable
+for (i in 1:101) {
+  y[,i]<-apply(FUN=mean,X=x[,i:(i+2)],MARGIN=1) }
+y<-y+matrix(rnorm(11*lt,mean=0,sd=3),11,lt)
 
+x<-x[,4:104]
+x<-wsyn::cleandat(x,times,1)$cdat 
+y<-wsyn::cleandat(y,times,1)$cdat
+
+#The relationship between the environmental and biological variables cannot 
+#readily be detected using ordinary correlation methods 
+allcors<-c()
+for (counter in 1:dim(x)[1])
+{
+  allcors[counter]<-cor(x[counter,],y[counter,])
+}
+grDevices::pdf(file=paste0(resloc,"CoherenceExample_LocalBiolEnvCorrs.pdf"))
+hist(allcors,xlab="Biol/env correlation",ylab="Count")
+grDevices::dev.off()
+
+#However, the function `coh` can be used to compute the coherence, which reveals a 
+#timescale-specific relationship
+if (file.exists(paste0(resloc,"CoherenceResults.Rds")))
+{
+  cohres<-readRDS(file=paste0(resloc,"CoherenceResults.Rds"))
+} else
+{
+  cohres<-wsyn::coh(dat1=x,dat2=y,times=times,norm="powall",
+         sigmethod="fftsurrog1",nrand=1000,
+         f0=0.5,scale.max.input=28)
+  saveRDS(cohres,file=paste0(resloc,"CoherenceResults.Rds"))
+}
+
+#now display what you get
+grDevices::pdf(file=paste0(resloc,"CoherenceExample_PlotCoh1.pdf"))
+wsyn::plotmag(cohres)
+grDevices::dev.off()
+
+#now add p-values for a couple bands
+cohres<-wsyn::bandtest(cohres,c(8,12))
+cohres<-wsyn::bandtest(cohres,c(2,4))
+
+#now display what you get again
+grDevices::pdf(file=paste0(resloc,"CoherenceExample_PlotCoh2.pdf"))
+wsyn::plotmag(cohres)
+grDevices::dev.off()
