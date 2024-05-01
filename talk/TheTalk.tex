@@ -51,10 +51,10 @@
 % ------------------------------------------------------------------------------
 % got this from here: https://www.overleaf.com/latex/examples/code-presentations-example-different-ways-shown-in-beamer-metropolis/tsxpnyjbhbds
 % ------------------------------------------------------------------------------
-\let\textttorig\texttt
-\renewcommand<>{\texttt}[1]{%
-  \only#2{\textttorig{#1}}%
-}
+%\let\textttorig\texttt
+%\renewcommand<>{\texttt}[1]{%
+%  \only#2{\textttorig{#1}}%
+%}
 
 \title[Wavelet approaches to synchrony]
 {
@@ -672,9 +672,53 @@ only the period-12 variability in driver 1 influences the populations
 
 \section{Kelp example}
 
+\begin{frame}
+\frametitle{Empirical example: kelp wrack on beaches near Santa Barbara, CA}
+Goals for the empirical example:
+\begin{itemize}
+\item Add concreteness through application to a real question
+\item Discuss some challenges posed by real-world data for application of methods
 
+\end{frame}
 
+\begin{frame}
+\frametitle{Empirical example: kelp wrack on beaches near Santa Barbara, CA}
+\begin{itemize}
+\item Giant kelp (Macrocystis pyrifera) is a rocky reef foundation species
+\item Its detritus provides a major resource subsidy to sandy beaches
+\item Can kelp forest synchronize beach dynamics through provision of wrack?
+\end{itemize}
+\begin{block}{Reference}
+Walter, J.A., et al. (2024) Spatial synchrony cascades across ecosystems and up food webs via resource subsidies. \textit{PNAS} 122(2) e2310052120.
+\end{block}
+%TODO add pretty pictures
+\end{frame}
 
+\begin{frame}
+\frametitle{Data sources}
+\begin{block}{Beach data}
+Santa Barbara Coastal LTER, J. Dugan, SBC LTER: Beach: Time-series of beach wrack cover and biomass, ongoing since 2008 ver 16. Environmental Data Initiative (2021). \url{https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-sbc.40.16}.
+\end{block}
+\begin{block}{Kelp forest and wave data}
+T. Bell, SBC LTER: Reef: California kelp canopy and environmental variable dynamics ver 1. 
+Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c8629cfa3fbe80fdc9e086a9aa}. 
+\end{block}
+\end{frame}
 
+\begin{frame}
+\frametitle{Preparing data for analysis}
+\begin{itemize}
+\item Analyses in \texttt{wsyn} require complete, regularly spaced time series
+\item Organize into site (beaches) by time (months, Jan. 200X to Dec. 20XX) matrices
+\item Fill any gaps with beach- and month-specific medians
+\end{frame}
+
+\begin{frame}
+\frametitle{Responsible gap-filling for synchrony analyses}
+\begin{itemize}
+\item Avoid borrowing information from neighboring sites. This can build in artefactual synchrony.
+\item Be cautious with temporal structures---preserve things that have well-defined periods and consistent amplitudes, e.g., seasonal and diurnal cycles.
+\item It may be impossible to responsibly fill many/large gaps. We have generally avoided analyzing time series with more than 20\% or so missing values, when there are several consecutive missing values, and when many/all locations are missing data simultaneously.
+\end{frame}
 
 \end{document}
