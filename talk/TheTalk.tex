@@ -666,14 +666,37 @@ only the period-12 variability in driver 1 influences the populations
 \item If we did not know the setup and only had the data, could we infer causes of synchrony?
 \item Because of how the data were constructed, we know:
 \begin{itemize}
-\item d1 is important for synchrony on long timescales (about 12 years)
-\item d2 is important for synchrony on both long (12 years) and short (3 years) timescales
+\item d1 is important for synchrony on long timescales (12 years)
+\item d2 is important for synchrony on long (12 years) and short (3 years) timescales
 \item dirrel is not important for synchrony
 \end{itemize}
-\item Can we infer these facts if we only had the data?
+\item Can we infer these facts from the data?
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{First fit a wavelet linear model}
+\begin{exampleblock}{Use \texttt{wsyn::wlm}}
+\begin{verbatim}
+dat<-list(pops=pops,d1=d1,d2=d2,dirrel=dirrel)
+wlm_all<-wsyn::wlm(dat,times,resp=1,pred=2:4,
+  norm="powall",scale.max.input=28)
+\end{verbatim}
+\end{exampleblock}
+\begin{block}{Wavelet linear model}
+\begin{itemize}
+\item $w^{(\text{pop})}_{n,\sigma}(t) = \alpha(\sigma) w^{(1)}_{n,\sigma}(t)+
+\beta(\sigma) w^{(2)}_{n,\sigma}(t)+
+\gamma(\sigma) w^{(\text{irrel})}_{n,\sigma}(t)$
+\item See Sheppard et al (2019), Plos Comp Biol for details
+\end{itemize}
+\end{block}
+\end{frame}
+
+%slides that show the process of testing each variable to then drop dirrel
+%then some stuff about calculating synchrony explained on each band
+%then compare with what we know b/c of how the data were generated
+%then a summay slide like "the point is, if you have the data, we can do X, Y Z"
 
 \section{Kelp example}
 
