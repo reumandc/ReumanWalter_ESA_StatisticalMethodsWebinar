@@ -80,22 +80,124 @@ May, 2024
 
 \section{Introduction}
 
-%In this Intro, we probably better put some of the caveating and provisors and citations
-%we are presently putting into our review. This is not the only way to consider timescale
-%specificity of synchrony, there is lots of other work on the subject, would be good
-%to respect some of that work before going on with our way of doing it. 
-%Maybe could have an example from an old Fourier paper (not even looking at synchrony) - timescale-specific methods have been used in ecology forever
-%Maybe have an example of a "precursor study" or two where you can see they are talking about timescale-specific things. And maybe also changes through time (mention a couple early papers showing changes in synchrony). 
-%Through decades of work by many researchers, the field has matured, helped at every stage by 1) long time series, and 2) ever improving statistical methods. This is one reasonably complete suite of such methods, but other authors use variant methods and so on which are also good and also allow us to learn about ecosystems.
-%And the methods all overlap, being based on now-standard standard wavelet tools, differing in details we won't go into 
-%Mention some of the other authors. 
-%Our way of thinking about methods has been implemented in wsyn
+\begin{frame}
+\frametitle{This talk is about spatial synchrony}
+\begin{itemize}
+\item Spatial (aka, population or metapopuation) synchrony is when populations of the same species in different places fluctuate in related/correlated ways
+\item Below left: more synchronous
+\item Below right: less/not synchronous (aka, ``asynchronous'')
+\end{itemize}
+\includegraphics[width= 0.49\textwidth]{figures/Sync.png}
+\includegraphics[width= 0.49\textwidth]{figures/Asyn.png}
+\end{frame}
 
-\section{wsyn and synthetic examples}
+\begin{frame}
+\frametitle{Why study synchrony? Ubiquitous. Also, importance of synchrony for aggregates:}
+\includegraphics[width= 0.49\textwidth]{figures/Sync.png}
+\includegraphics[width= 0.49\textwidth]{figures/Asyn.png}\\
+\includegraphics[width= 0.49\textwidth]{figures/SyncAvg.png}
+\includegraphics[width= 0.49\textwidth]{figures/AsynAvg.png}
+\end{frame}
 
-%Somewhere above here you need to say the viewpoint is operational, i.e.,
-%we talk about what these tools can get you and how you intepret it. Main ideas. 
-%No time for detailed math, but we can provide some references if you want. 
+\begin{frame}
+\frametitle{Causes of synchrony}
+\begin{itemize}
+\item The known possible causes
+\begin{itemize}
+\item Synchrony of environmental drivers (called the Moran effect)
+\item Dispersal
+\item Synchronous or mobile predators
+\end{itemize}
+\item Historically, hard to distinguish the causes in any given field system
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Our goal today, but first...}
+\begin{block}{The goal today}
+\begin{itemize}
+\item The goal: to introduce \texttt{wsyn} and what can be done with it
+\item Facilitates time- and timescale-specific analyses of synchrony
+\item Facilitates inferences of environmental causes of sycnhrony 
+\end{itemize}
+\end{block}
+\begin{block}{Need to give a nod to some history, first}
+\begin{itemize}
+\item Timescale-specific approaches have developed through time
+\item So has consideration of changes through time in synchrony
+\item So have efforts to infer causes of synchrony
+\item All of these themes have a substantial history
+\item We can't review it all, but we briefly review some, to emphasize there are other approaches, and our approach builds on much prior work
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Timescale-specific approach: what is it?}
+\begin{center}
+\includegraphics[height=.8\textheight]{figures/Cospectra_explanation.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Early, influential example of a timescale-specific approach}
+\begin{itemize}
+\item Grenfell et al (2001), studied measles dynamics in the UK
+\item Measles had a bennial outbreak dynamic (pre-vaccine era)
+\item By studying synchrony at that specific timescale, the authors demonstrated travelling waves and changing synchrony
+\item Key to their approach was a wavelet-based, timescale-specific approach
+\item Below: their wavelet reconstruction of annual fluctuations in London, Cambridge and Norwich
+\end{itemize}
+\includegraphics[width=\textwidth]{figures/Grenfell_etal_2001_3.png}
+\begin{itemize}
+\item Note: this is one of many prior timescale-specific approaches
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Early examples of changes in synchrony through time}
+\begin{itemize}
+\item The Grenfell study shows a bit of the history of changes in synchrony, too
+\item But changes were studied before that! 
+\item Steen et al (1990) showed changing synchrony in 79-year time series of small rodents in Norway
+\item 1=lots, 0=fewer. Note synchrony is disrupted from 1905-1915 or so, the returns.
+\end{itemize}
+\includegraphics[width=\textwidth]{figures/Steen_etal_1990_3.png}
+\begin{itemize}
+\item Note: one of many prior efforts documenting changes in synchrony
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Early examples of inferences of causes of synchrony}
+\begin{itemize}
+\item There have been many, ranging from suggestions of causes to virtual certainty
+\item One entertaining early type is special cases where 2 of 3 possible causes were impossible!
+\item Grenfell et al (1998) showed sheep synchrony on two islands in north Atlantic
+\item Dispersal not possible, no predators, must be Moran effects!
+\end{itemize}
+\includegraphics[width=\textwidth]{figures/StKilda.jpg}
+\end{frame}
+
+\begin{frame}
+\frametitle{Restatement of goals, and the viewpoint}
+\begin{block}{Restatement of goal}
+\begin{itemize}
+\item The field has matured - time/timescale approaches and inferences of causes now common
+\item One framework is implemented in \texttt{wsyn}
+\item We want to introduce \texttt{wsyn} and what you get from it
+\end{itemize}
+\end{block}
+\begin{block}{The viewpoint}
+\begin{itemize}
+\item Operational - how to use these tools, how to interpret results
+\item Math is minimal. Detailed references are available though!
+\item We first intro \texttt{wsyn} on made up data, then on real data on a kelp system
+\end{itemize}
+\end{block}
+\end{frame}
+
+
 
 %We should probably have a "reference" section in the github where we put:
 %1) Torrence and Compo
@@ -106,6 +208,9 @@ May, 2024
 %You also want to mention, Dan, that the codes for this are in the github for the 
 %seminar, and these are abbreviated from the vignette, so you have those two 
 %resources, the latter in greater depth than what I have time for here.
+
+
+\section{wsyn and synthetic examples}
 
 \subsection{Wavelet transform}
 
