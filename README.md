@@ -24,7 +24,8 @@ on Jon's and Dan's  machines, so no guarantees if a lot of time has passed since
 We made no efforts at long-term reproducibility, but our R and package versions are listed below.
 
 To recompile the talk slides, compile the latex in `talk`, under the file name `TheTalk.tex`.
-This is ordinary beamer latex. 
+This is ordinary beamer latex. This can be done from within R studio if you have it configured
+correctly. The pdflatex command from the ubuntu command line can also work. 
 
 ## Dependencies
 
