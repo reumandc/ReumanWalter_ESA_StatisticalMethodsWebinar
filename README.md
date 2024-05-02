@@ -23,7 +23,8 @@ that you don't have for this to work. Keep in mind these codes were run shortly 
 on Jon's and Dan's  machines, so no guarantees if a lot of time has passed since then.
 We made no efforts at long-term reproducibility, but our R and package versions are listed below.
 
-To recompile the talk slides, compile the latex in `talk`, under the file name `TheTalk.tex`.
+AFTER having run the R codes, to recompile the talk slides, compile the latex in `talk`, under the file name `TheTalk.tex`. You have to do this after you run R codes because the R codes generate the figures
+which are then sucked up into the latex doc. Without those figures, the latex won't compile. 
 This is ordinary beamer latex. This can be done from within R studio if you have it configured
 correctly. The pdflatex command from the ubuntu command line can also work. 
 
