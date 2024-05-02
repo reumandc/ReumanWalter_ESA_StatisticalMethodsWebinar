@@ -326,13 +326,13 @@ wsyn::plotmag(wpmfres,sigthresh=0.95)
 \begin{frame}
 \frametitle{The wavelet mean field (\texttt{wsyn::wmf})}
   \begin{itemize}
-    \item We also use the ``wavelet mean field'' $r_\sigma(t)=\frac{1}{N}\sum_{n=1}^{N}w_{n,\sigma}(t)$
-    \item Where $w_{n,\sigma}(t)=W_{n,\sigma}(t)/\sqrt{\frac{1}{NT}\sum_{n=1}^{N}\sum_{t=1}^{T}W_{n,\sigma}(t)W_{n,\sigma}^{*}(t)}$ is a normalized wavelet transform
-    \item The wmf uses magnitude as well as phase information, gives more complete information but a bit more complicated
-    \item Can interpret it in a similar way
-    \item But no straightforward significance testing!
-    \item We often show both
-    \item See \texttt{wsyn} vignette for details on how to call the \texttt{wmf} function
+    \item We also use the ``wavelet mean field'' %$r_\sigma(t)=\frac{1}{N}\sum_{n=1}^{N}w_{n,\sigma}(t)$
+    %\item Where $w_{n,\sigma}(t)=W_{n,\sigma}(t)/\sqrt{\frac{1}{NT}\sum_{n=1}^{N}\sum_{t=1}^{T}W_{n,\sigma}(t)W_{n,\sigma}^{*}(t)}$ is a normalized wavelet transform
+    %\item The wmf uses magnitude as well as phase information, gives more complete information but a bit more complicated
+    \item Can interpret it in a similar way to \texttt{wpmf}
+    %\item But no straightforward significance testing!
+    %\item We often show both
+    \item See \texttt{wsyn} vignette for details %on how to call the \texttt{wmf} function
   \end{itemize}
 \end{frame}
 
@@ -621,82 +621,93 @@ coherent on a certain timescale band, then, logically, EITHER...
 \end{frame}
 
 \begin{frame}
-\frametitle{Some analytic frameworks}
+\frametitle{An analytic frameworks}
 \begin{itemize}
 \item Based on what I showed you, and for the purpose of understanding environmental drivers of synchrony...
 \item We developed a wavelet linear modeling framework
 \item And a ``wavelet Moran theorem'' and ``synchrony attribution theorem''
-\item See Sheppard et al (2016), Nature Climate Change
-\item And Sheppard et al (2019), Plos Comp Biol
-\item And the vignette
-\item I want to demo these tools with made-up data before Jon applies them
+\item See Sheppard et al (2016), Nature Climate Change; and Sheppard et al (2019), Plos Comp Biol
+\item And the vignette; and the code that accompanies this talk
+\item I don't have time to demo these tools, but Jon will apply them
 \item They provide a reasonably comprehensive tool set for investigating environmental causes of synchrony
+\item I hope we will also have provided the necessary background where you can read the vignette for a demo
+\item The tools center on the \texttt{wsyn::wlm} function
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{The made-up data: environmental}
-\begin{itemize}
-\item Everything is in 10 locations
-\item Environmental variable 1, d1
-\begin{itemize}
-\item an oscillation of period $12$ years and an oscillation of period $3$ years
-\item and strong white noise
-\end{itemize}
-\item Environmental variable 2, d2, was the same structure, but independently generated
-\item Environmental variable 3, dirrel, was white noise only
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{The made-up data: populations}
-\begin{itemize}
-\item The population in each location is influenced by the two drivers...
-\item And by separate, independent local variability
-\item Driver 1 is averaged over 3 time steps in its influence, so
-only the period-12 variability in driver 1 influences the populations
-\item Driver 2 influences populations directly
-\item dirrel has no influence (hence the name)
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{The goal}
-\begin{itemize}
-\item If we did not know the setup and only had the data, could we infer causes of synchrony?
-\item Because of how the data were constructed, we know:
-\begin{itemize}
-\item d1 is important for synchrony on long timescales (12 years)
-\item d2 is important for synchrony on long (12 years) and short (3 years) timescales
-\item dirrel is not important for synchrony
-\end{itemize}
-\item Can we infer these facts from the data?
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{First fit a wavelet linear model}
-\begin{exampleblock}{Use \texttt{wsyn::wlm}}
-\begin{verbatim}
-dat<-list(pops=pops,d1=d1,d2=d2,dirrel=dirrel)
-wlm_all<-wsyn::wlm(dat,times,resp=1,pred=2:4,
-  norm="powall",scale.max.input=28)
-\end{verbatim}
-\end{exampleblock}
-\begin{block}{Wavelet linear model}
-\begin{itemize}
-\item $w^{(\text{pop})}_{n,\sigma}(t) = \alpha(\sigma) w^{(1)}_{n,\sigma}(t)+
-\beta(\sigma) w^{(2)}_{n,\sigma}(t)+
-\gamma(\sigma) w^{(\text{irrel})}_{n,\sigma}(t)$
-\item See Sheppard et al (2019), Plos Comp Biol for details
-\end{itemize}
-\end{block}
-\end{frame}
+% \begin{frame}
+% \frametitle{The made-up data: environmental}
+% \begin{itemize}
+% \item Everything is in 10 locations
+% \item Environmental variable 1, d1
+% \begin{itemize}
+% \item an oscillation of period $12$ years and an oscillation of period $3$ years
+% \item and strong white noise
+% \end{itemize}
+% \item Environmental variable 2, d2, was the same structure, but independently generated
+% \item Environmental variable 3, dirrel, was white noise only
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}
+% \frametitle{The made-up data: populations}
+% \begin{itemize}
+% \item The population in each location is influenced by the two drivers...
+% \item And by separate, independent local variability
+% \item Driver 1 is averaged over 3 time steps in its influence, so
+% only the period-12 variability in driver 1 influences the populations
+% \item Driver 2 influences populations directly
+% \item dirrel has no influence (hence the name)
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}
+% \frametitle{The goal}
+% \begin{itemize}
+% \item If we did not know the setup and only had the data, could we infer causes of synchrony?
+% \item Because of how the data were constructed, we know:
+% \begin{itemize}
+% \item d1 is important for synchrony on long timescales (12 years)
+% \item d2 is important for synchrony on long (12 years) and short (3 years) timescales
+% \item dirrel is not important for synchrony
+% \end{itemize}
+% \item Can we infer these facts from the data?
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+% \frametitle{First fit a wavelet linear model}
+% \begin{exampleblock}{Use \texttt{wsyn::wlm}}
+% \begin{verbatim}
+% dat<-list(pops=pops,d1=d1,d2=d2,dirrel=dirrel)
+% wlm_all<-wsyn::wlm(dat,times,resp=1,pred=2:4,
+%   norm="powall",scale.max.input=28)
+% \end{verbatim}
+% \end{exampleblock}
+% \begin{block}{Wavelet linear model}
+% \begin{itemize}
+% \item $w^{(\text{pop})}_{n,\sigma}(t) = \alpha(\sigma) w^{(1)}_{n,\sigma}(t)+
+% \beta(\sigma) w^{(2)}_{n,\sigma}(t)+
+% \gamma(\sigma) w^{(\text{irrel})}_{n,\sigma}(t)$
+% \item See Sheppard et al (2019), Plos Comp Biol for details
+% \end{itemize}
+% \end{block}
+% \end{frame}
 
 %slides that show the process of testing each variable to then drop dirrel
 %then some stuff about calculating synchrony explained on each band
 %then compare with what we know b/c of how the data were generated
 %then a summay slide like "the point is, if you have the data, we can do X, Y Z"
+
+{\setbeamercolor{background canvas}{bg=lightgreen}
+\begin{frame}
+\frametitle{Upshot: what can the tools do?}
+\begin{itemize}
+\item You can investigate which environmental variables most likely helped cause synchrony in a set of populations, on any given timescale band
+\item You can quantify the fraction of observed synchrony explained by each of those factors
+\item You can quantify the fraction of observed synchrony explained by each pairwise interaction
+\end{itemize}
+\end{frame}}
 
 \section{Kelp example}
 
