@@ -96,32 +96,32 @@ annual <- c(8,16) #months
 intann <- c(16,60) #months
 
 #nrand is relatively small to speed computation. Often 10,000 is used for publications with the fast method
-wrackXkelp <- coh(wrack.cln, kelp.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
-wrackXkelp <- bandtest(wrackXkelp, subann)
-wrackXkelp <- bandtest(wrackXkelp, annual)
-wrackXkelp <- bandtest(wrackXkelp, intann)
+wrackXkelp <- wsyn::coh(wrack.cln, kelp.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, subann)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, annual)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, intann)
 
 pdf(paste0(resloc,"wrackXkelp_cohmag.pdf"))
-plotmag(wrackXkelp) #coherence on subannual, annual and interannual
+wsyn::plotmag(wrackXkelp) #coherence on subannual, annual and interannual
 dev.off()
 
 pdf(paste0(resloc,"wrackXkelp_cohphase.pdf"))
-plotphase(wrackXkelp) #phase lagged on annual and interannual 
+wsyn::plotphase(wrackXkelp) #phase lagged on annual and interannual 
 dev.off()
 
-wrackXwidth <- coh(wrack.cln, beachwidth.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
-wrackXwidth <- bandtest(wrackXwidth, subann)
-wrackXwidth <- bandtest(wrackXwidth, annual)
-wrackXwidth <- bandtest(wrackXwidth, intann)
-plotmag(wrackXwidth) #coherence on seasonal, annual, interannual
-plotphase(wrackXwidth) #in phase on annual, borderline in-phase or lagged on long timescales
+wrackXwidth <- wsyn::coh(wrack.cln, beachwidth.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
+wrackXwidth <- wsyn::bandtest(wrackXwidth, subann)
+wrackXwidth <- wsyn::bandtest(wrackXwidth, annual)
+wrackXwidth <- wsyn::bandtest(wrackXwidth, intann)
+wsyn::plotmag(wrackXwidth) #coherence on seasonal, annual, interannual
+wsyn::plotphase(wrackXwidth) #in phase on annual, borderline in-phase or lagged on long timescales
 
-wrackXwavediff <- coh(wrack.cln, wavediff.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
-wrackXwavediff <- bandtest(wrackXwavediff, subann)
-wrackXwavediff <- bandtest(wrackXwavediff, annual)
-wrackXwavediff <- bandtest(wrackXwavediff, intann)
-plotmag(wrackXwavediff) #coherence on seasonal, annual, interannual
-plotphase(wrackXwavediff) #in phase on annual, borderline in-phase or lagged on long timescales
+wrackXwavediff <- wsyn::coh(wrack.cln, wavediff.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
+wrackXwavediff <- wsyn::bandtest(wrackXwavediff, subann)
+wrackXwavediff <- wsyn::bandtest(wrackXwavediff, annual)
+wrackXwavediff <- wsyn::bandtest(wrackXwavediff, intann)
+wsyn::plotmag(wrackXwavediff) #coherence on seasonal, annual, interannual
+wsyn::plotphase(wrackXwavediff) #in phase on annual, borderline in-phase or lagged on long timescales
 
 
 
@@ -131,24 +131,24 @@ plotphase(wrackXwavediff) #in phase on annual, borderline in-phase or lagged on 
 #wrack on the annual timescale band
 
 datlist <- list(wrack.cln, kelp.cln, wavediff.cln, beachwidth.cln)
-wlm.annual <- wlm(datlist, tt, resp=1, pred=c(2,3,4), norm="powall", f0=1)
+wlm.annual <- wsyn::wlm(datlist, tt, resp=1, pred=c(2,3,4), norm="powall", f0=1)
 #get whole-model p-value by 'dropping' all predictors
 #note: can drop a single predictor to get a p-value for that predictor
-wlmtest.annual <- wlmtest(wlm.annual, drop=2:4, sigmethod = "fft", nrand=100)
-wlmtest.annual <- bandtest(wlmtest.annual, annual)
+wlmtest.annual <- wsyn::wlmtest(wlm.annual, drop=2:4, sigmethod = "fft", nrand=100)
+wlmtest.annual <- wsyn::bandtest(wlmtest.annual, annual)
 print(wlmtest.annual$bandp)
 
 #output and plot predicted synchrony
-predsync.annual <- predsync(wlm.annual)
+predsync.annual <- wsyn::predsync(wlm.annual)
 
 pdf(paste0(resloc,"wrackWLM_pred.pdf"))
-plotmag(predsync.annual, zlims=c(0,max(Mod(wmf.wrack$values), na.rm=TRUE)))
+wsyn::plotmag(predsync.annual, zlims=c(0,max(Mod(wmf.wrack$values), na.rm=TRUE)))
 abline(h=log2(annual), lwd=3)
 mtext("WLM predicted synchrony")
 dev.off()
 
 #look at synchrony explained across all timescales
-syncexpl.annual <- syncexpl(wlm.annual)
+syncexpl.annual <- wsyn::syncexpl(wlm.annual)
 print(round(syncexpl.annual,3))
 
 #subset to wavelet components in annual timescale band
