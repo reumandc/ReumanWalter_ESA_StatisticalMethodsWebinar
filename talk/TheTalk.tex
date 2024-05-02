@@ -818,10 +818,15 @@ coherent on a certain timescale band, then, logically, EITHER...
 
 \begin{frame}
 \frametitle{Empirical example: kelp wrack on beaches near Santa Barbara, CA}
+%TODO: add a nice picture
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical example: kelp wrack on beaches near Santa Barbara, CA}
 Goals for the empirical example:
 \begin{itemize}
-\item Add concreteness through application to a real question
-\item Discuss some challenges posed by real-world data for application of methods
+\item Add concreteness through application to a real system
+\item Discuss some challenges posed by real-world data for application of these methods
 \end{itemize}
 \end{frame}
 
@@ -835,7 +840,6 @@ Goals for the empirical example:
 \begin{block}{Reference}
 Walter, J.A., et al. (2024) Spatial synchrony cascades across ecosystems and up food webs via resource subsidies. \textit{PNAS} 122(2) e2310052120.
 \end{block}
-%TODO add pretty pictures
 \end{frame}
 
 \begin{frame}
@@ -853,8 +857,8 @@ Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c
 \frametitle{Preparing data for analysis}
 \begin{itemize}
 \item Analyses in \texttt{wsyn} require complete, regularly spaced time series
-\item Organize into site (beaches) by time (months, Jan. 200X to Dec. 20XX) matrices
-\item Fill any gaps with beach- and month-specific medians
+\item Organize into site (beaches) by time (months, Jan. 2009 to Dec. 2019) matrices
+\item Fill any gaps with site- and month-specific medians
 \end{itemize}
 \end{frame}
 
@@ -877,37 +881,207 @@ Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c
 \begin{exampleblock}{Apply \texttt{wsyn::cleandat}}
 \begin{verbatim}
 wrack <- as.matrix(read.csv("../data/wrack.csv"))
-wrack.cln <- cleandat(wrack, tt, clev=5)$cdat 
+tt <- 1:ncol(wrack)
+wrack.cln <- wsyn::cleandat(wrack, tt, clev=5)$cdat 
 \end{verbatim}
 \end{exampleblock}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Make \texttt{wmf} and \texttt{wpmf}}
-%\begin{exampleblock}{Apply \texttt{wsyn::wmf} and \textt{wsyn::wpmf}}
-%\begin{verbatim}
-%wmf.wrack <- wsyn::wmf(wrack.cln, tt)
-%wpmf.wrack <- wsyn::wpmf(wrack.cln, tt, sigmethod="quick")
-%wsyn::plotmag(wmf.wrack)
-%wsyn::plotmag(wpmf.wrack)
-%\end{verbatim}
-%\end{exampleblock}
+The wavelet mean field (WMF) and wavelet phasor mean field (WPMF) quantify synchrony as a function of time and timescale.
+\begin{exampleblock}{Apply \texttt{wsyn::wmf} and \texttt{wsyn::wpmf}}
+\begin{verbatim}
+wmf.wrack <- wsyn::wmf(wrack.cln, tt)
+wpmf.wrack <- wsyn::wpmf(wrack.cln, tt, 
+  sigmethod="quick")
+wsyn::plotmag(wmf.wrack)
+wsyn::plotmag(wpmf.wrack)
+\end{verbatim}
+\end{exampleblock}
 \end{frame}
 
-\begin{frame}
-\frametitle{Interpret wmf and wpmf}
-%TODO add images
+\begin{frame}[fragile]
+\frametitle{Interpret \texttt{wmf} and \texttt{wpmf}}
+\begin{columns}[c]
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWMF.pdf}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWPMF.pdf}
+\end{column}
+\end{columns}
 %Remember to talk here about choosing timescale bands to focus on
 \end{frame}
 
 \begin{frame}
-\frametitle{Coherence testing}
-
+\frametitle{Choosing timescale bands of interest}
+\begin{itemize}
+\item Focusing on \textit{bands} of timescales aids synthesis and reduces multiple testing issues
+\item Sometimes defined \textit{a priori} using system knowledge or general theoretical considerations
+\item But often judged based on data--at what timescales are there interesting dynamics (synchrony)?
+\end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Choosing timescale bands of interest}
+We chose 2-8 mo, 8-16 mo, and 16-60 mo as focal timescale bands.
+\begin{columns}[c]
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWMF2.pdf}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWPMF2.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Coherence testing}
+\begin{exampleblock}{Apply \texttt{wsyn::coh}}
+\begin{verbatim}
+#set timescale ranges
+subann <- c(0,8) #months
+annual <- c(8,16) #months
+intann <- c(16,60) #months
+#run coherence test
+wrackXkelp <- wsyn::coh(wrack.cln, kelp.cln, tt, 
+  sigmethod="fast", norm="powall", nrand=1000)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, subann)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, annual)
+wrackXkelp <- wsyn::bandtest(wrackXkelp, intann)
+wsyn::plotmag(wrackXkelp) 
+wsyn::plotphase(wrackXkelp)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
 
 \begin{frame}
-
+\frametitle{Coherence testing}
+\begin{columns}[c]
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackXkelp_cohmag.pdf}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackXkelp_cohphase.pdf}
+\end{column}
+\end{columns}
+Note: dashed red line shows approximation used by fast testing method.
 \end{frame}
+
+\begin{frame}
+\frametitle{Summary of coherence tests including other 'driver' variables}
+\begin{tabular}{lccc}
+\hline
+    & 2-8 mo & 8-16 mo & 16-60 mo \\ 
+\hline
+  Kelp & $p=0.101$ & \textbf{$p=0.016$} & $p=0.003$ \\ 
+\hline
+  Waves & $p=0.022$ & $p=0.004$ & $p=0.299$ \\ 
+\hline
+  Beach width & $p=0.288$ & $p=0.006$ & $p=0.108$ \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\frametitle{Building wavelet linear models}
+\begin{itemize}
+\item Multiple driver variables are coherent with beach wrack!
+\item WLMs help understand combined effects and interactions.
+\item Model selection tools are limited (e.g., no AIC), and potential for overfitting is high, especially at long timescales.
+\item Careful variable selection up front, as opposed to fitting lots of models and selecting the ``best" one.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Building wavelet linear models}
+\begin{exampleblock}{Apply \texttt{wsyn::wlm}}
+\begin{verbatim}
+datlist <- list(wrack.cln, kelp.cln, wavediff.cln, 
+  beachwidth.cln)
+wlm.annual <- wsyn::wlm(datlist, tt, resp=1, 
+  pred=c(2,3,4), norm="powall")
+#get whole-model p-value by 'dropping' all predictors
+#low nrand for fast computation, normally >=1000
+wlmtest.annual <- wsyn::wlmtest(wlm.annual, drop=2:4, 
+  sigmethod = "fft", nrand=100)
+wlmtest.annual <- wsyn::bandtest(wlmtest.annual, annual)
+predsync.annual <- wsyn::predsync(wlm.annual)
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{WLM results}
+Whole-model p-value: $p < 0.01$
+\begin{columns}[c]
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWMF2.pdf}
+\end{column}
+\begin{column}{6cm}
+\includegraphics[width=\textwidth]{../results/kelp_results/wrackWLM_pred.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Synchrony explained}
+\begin{exampleblock}{Apply \texttt{wsyn::syncexpl}}
+\begin{verbatim}
+syncexpl.annual <- wsyn::syncexpl(wlm.annual)
+\end{verbatim}
+\end{exampleblock}
+%\end{frame}
+
+%\begin{frame}
+%\frametitle{Synchrony explained}
+\vspace{4pt}
+\resizebox{10cm}{!}
+{
+\begin{tabular}{rrrrrrrrrr}
+  \hline
+ timescales & sync & syncexpl & crossterms & resids & pred1 & pred2 & pred3 & interactions\\ 
+  \hline
+  8.23 & 0.37 & 0.17 & 0.01 & 0.19 & 0.06 & 0.07 & 0.00 & 0.04 \\ 
+  8.64 & 0.38 & 0.23 & -0.02 & 0.16 & 0.08 & 0.07 & 0.01 & 0.07 \\ 
+  9.08 & 0.41 & 0.28 & -0.03 & 0.15 & 0.09 & 0.06 & 0.01 & 0.11 \\ 
+  9.53 & 0.45 & 0.32 & -0.02 & 0.15 & 0.08 & 0.07 & 0.04 & 0.13 \\ 
+  10.01 & 0.49 & 0.36 & -0.00 & 0.14 & 0.06 & 0.11 & 0.10 & 0.08 \\ 
+  10.51 & 0.54 & 0.40 & 0.03 & 0.11 & 0.04 & 0.20 & 0.20 & -0.05 \\ 
+  11.03 & 0.59 & 0.45 & 0.06 & 0.09 & 0.03 & 0.32 & 0.32 & -0.22 \\ 
+  11.58 & 0.64 & 0.49 & 0.07 & 0.07 & 0.01 & 0.43 & 0.44 & -0.39 \\ 
+  12.16 & 0.68 & 0.53 & 0.09 & 0.06 & 0.00 & 0.54 & 0.53 & -0.53 \\ 
+  12.77 & 0.70 & 0.57 & 0.08 & 0.05 & 0.02 & 0.62 & 0.52 & -0.59 \\ 
+  13.41 & 0.71 & 0.59 & 0.06 & 0.05 & 0.07 & 0.62 & 0.41 & -0.50 \\ 
+  14.08 & 0.69 & 0.59 & 0.04 & 0.06 & 0.09 & 0.54 & 0.28 & -0.33 \\ 
+  14.78 & 0.64 & 0.53 & 0.02 & 0.08 & 0.09 & 0.48 & 0.21 & -0.24 \\ 
+  15.52 & 0.55 & 0.43 & 0.02 & 0.10 & 0.09 & 0.68 & 0.22 & -0.56 \\ 
+   \hline
+\end{tabular}
+}
+\vspace{1pt}
+Note: output truncated for brevity.
+\end{frame}
+
+\begin{frame}
+\frametitle{Synchrony explained}
+\begin{itemize}
+\item The band-averaged fraction of synchrony explained is 0.76.
+\item One reason to be confident in this is the cross-terms are 0.07 of the synchrony explained.
+\item Generally, $<10\%$ is considered acceptable.
+\end{itemize}
+\end{frame}
+
+{\setbeamercolor{background canvas}{bg=lightgreen}
+\begin{frame}
+\frametitle{Upshot: takeaways from empirical example?}
+\begin{itemize}
+\item Synchrony in wrack is explained by synchronous kelp production, mediated by waves and beach width
+\item Considerations for working with real data, e.g., gap filling and cleaning steps
+\item Selecting timescale bands of interest
+\item Selecting covariates for WLMs and model parsimony
+\end{itemize}
+\end{frame}}
 
 \end{document}
