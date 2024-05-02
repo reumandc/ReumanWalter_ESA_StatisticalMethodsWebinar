@@ -244,7 +244,7 @@ based on the wavelet transform
 \begin{block}{Fake data characteristics}
 \begin{itemize}
 \item Several time series
-\item All have one underlyig signal, switches from period 10 to 5 mid way
+\item All have one underlying signal, switches from period 10 to 5 mid way
 \item All have randomly phase-shifted period-3 sine ways
 \item Plus white noise, independent in each signal
 \end{itemize}
@@ -749,6 +749,38 @@ Environmental Data Initiative (2023). \url{https://doi.org/10.6073/pasta/c40db2c
 \item Be cautious with temporal structures---preserve things that have well-defined periods and consistent amplitudes, e.g., seasonal and diurnal cycles.
 \item It may be impossible to responsibly fill many/large gaps. We have generally avoided analyzing time series with more than 20\% or so missing values, when there are several consecutive missing values, and when many/all locations are missing data simultaneously.
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data prep with \texttt{wsyn::cleandat}}
+\begin{itemize}
+\item \texttt{wsyn} requires each time series have mean = 0 and will throw an error if this is not the case.
+\item May also detrend (linear), tranform to improve normality (Box-Cox), standardize (Z-score). 
+\item Standard options provided in \texttt{cleandat}; controlled using \texttt{clev} argument.
+\end{itemize}
+\begin{exampleblock}{Apply \texttt{wsyn::cleandat}}
+\begin{verbatim}
+wrack <- as.matrix(read.csv("../data/wrack.csv"))
+wrack.cln <- cleandat(wrack, tt, clev=5)$cdat 
+\end{verbatim}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Make \texttt{wmf} and \texttt{wpmf}}
+%\begin{exampleblock}{Apply \texttt{wsyn::wmf} and \textt{wsyn::wpmf}}
+%\begin{verbatim}
+%wmf.wrack <- wsyn::wmf(wrack.cln, tt)
+%wpmf.wrack <- wsyn::wpmf(wrack.cln, tt, sigmethod="quick")
+%wsyn::plotmag(wmf.wrack)
+%wsyn::plotmag(wpmf.wrack)
+%\end{verbatim}
+%\end{exampleblock}
+\end{frame}
+
+\begin{frame}
+\frametitle{Interpret wmf and wpmf}
+%TODO add images
 \end{frame}
 
 \end{document}
