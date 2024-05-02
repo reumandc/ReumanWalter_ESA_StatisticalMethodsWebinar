@@ -42,10 +42,10 @@ Jon used R version 4.2.1 running on MacOS 12.7.4 and RStudio version 2023.09.1+4
 The packages we used were more or less current around the time the talk was given. Specifically:
 
 Dan: 
-wsyn, version 1.0.4;
+wsyn, version 1.0.4
 
 Jon:
-wsyn, version 1.0.4;
+wsyn, version 1.0.4
 
 You may have to install the versions of R, R studio, and the packages listed above to get the code to
 run if a lot of time has passed since the talk. 
@@ -60,7 +60,8 @@ multiple machines. It is not guaranteed to work on the first try without any han
 
 ## Acknowlegements
 
-<Insert ack here>
+We acknowledge all the coauthors with whom we worked in writing the initial papers
+on which this work is based, and the R package wsyn. 
 
 
 
