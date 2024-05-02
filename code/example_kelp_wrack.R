@@ -24,7 +24,14 @@ library(wsyn)
 
 
 #This sets the working directory to the ./code subdirectory but only works if using RStudio
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) 
+
+
+resloc<-"../results/kelp_results/"
+if (!dir.exists(resloc))
+{
+  dir.create(resloc,recursive=TRUE)
+}
 
 ## load datasets ----------------------------------------------------------------------------------
 
@@ -45,20 +52,40 @@ tt=1:132 #vector of timesteps
 
 ## apply cleandat() to normalize, detrend, and scale ----------------------------------------------
 
-beachwidth.cln <- cleandat(beachwidth, tt, clev=5)$cdat
-wavediff.cln <- cleandat(wavediff, tt, clev=5)$cdat
-kelp.cln <- cleandat(kelp, tt, clev=5)$cdat
-wrack.cln <- cleandat(wrack, tt, clev=5)$cdat
+beachwidth.cln <- wsyn::cleandat(beachwidth, tt, clev=5)$cdat
+wavediff.cln <- wsyn::cleandat(wavediff, tt, clev=5)$cdat
+kelp.cln <- wsyn::cleandat(kelp, tt, clev=5)$cdat
+wrack.cln <- wsyn::cleandat(wrack, tt, clev=5)$cdat
 
 
 ## Create wavelet mean fields ---------------------------------------------------------------------
 
+wmf.wrack <- wsyn::wmf(wrack.cln, tt)
+wpmf.wrack <- wsyn::wpmf(wrack.cln, tt, sigmethod="quick")
 
-wmf.wrack <- wmf(wrack.cln, tt)
-wpmf.wrack <- wpmf(wrack.cln, tt, sigmethod="quick")
+pdf(paste0(resloc,"wrackWMF.pdf"))
+wsyn::plotmag(wmf.wrack)
+mtext("Wavelet mean field")
+dev.off()
 
-plotmag(wmf.wrack)
-plotmag(wpmf.wrack)
+pdf(paste0(resloc,"wrackWPMF.pdf"))
+wsyn::plotmag(wpmf.wrack)
+mtext("Wavelet phasor mean field")
+dev.off()
+
+#Just adding timescale bands to these figs for pedagogical reasons
+pdf(paste0(resloc,"wrackWMF2.pdf"))
+wsyn::plotmag(wmf.wrack)
+abline(h=log2(c(8,16)), lwd=3)
+mtext("Wavelet mean field")
+dev.off()
+
+pdf(paste0(resloc,"wrackWPMF2.pdf"))
+wsyn::plotmag(wpmf.wrack)
+mtext("Wavelet phasor mean field")
+abline(h=log2(c(8,16)), lwd=3)
+dev.off()
+
 
 
 ## Wavelet spatial coherence analyses -------------------------------------------------------------
@@ -73,8 +100,14 @@ wrackXkelp <- coh(wrack.cln, kelp.cln, tt, sigmethod="fast", norm="powall", nran
 wrackXkelp <- bandtest(wrackXkelp, subann)
 wrackXkelp <- bandtest(wrackXkelp, annual)
 wrackXkelp <- bandtest(wrackXkelp, intann)
-plotmag(wrackXkelp) #coherence on subannual, annual and interannual 
-plotphase(wrackXkelp) #phase lagged on annual and interannial 
+
+pdf(paste0(resloc,"wrackXkelp_cohmag.pdf"))
+plotmag(wrackXkelp) #coherence on subannual, annual and interannual
+dev.off()
+
+pdf(paste0(resloc,"wrackXkelp_cohphase.pdf"))
+plotphase(wrackXkelp) #phase lagged on annual and interannual 
+dev.off()
 
 wrackXwidth <- coh(wrack.cln, beachwidth.cln, tt, sigmethod="fast", norm="powall", nrand=1000)
 wrackXwidth <- bandtest(wrackXwidth, subann)
@@ -100,20 +133,28 @@ plotphase(wrackXwavediff) #in phase on annual, borderline in-phase or lagged on 
 datlist <- list(wrack.cln, kelp.cln, wavediff.cln, beachwidth.cln)
 wlm.annual <- wlm(datlist, tt, resp=1, pred=c(2,3,4), norm="powall", f0=1)
 #get whole-model p-value by 'dropping' all predictors
+#note: can drop a single predictor to get a p-value for that predictor
 wlmtest.annual <- wlmtest(wlm.annual, drop=2:4, sigmethod = "fft", nrand=100)
 wlmtest.annual <- bandtest(wlmtest.annual, annual)
 print(wlmtest.annual$bandp)
 
-#note: can drop a single predictor to get a p-value for that predictor
+#output and plot predicted synchrony
+predsync.annual <- predsync(wlm.annual)
+
+pdf(paste0(resloc,"wrackWLM_pred.pdf"))
+plotmag(predsync.annual, zlims=c(0,max(Mod(wmf.wrack$values), na.rm=TRUE)))
+abline(h=log2(annual), lwd=3)
+mtext("WLM predicted synchrony")
+dev.off()
 
 #look at synchrony explained across all timescales
 syncexpl.annual <- syncexpl(wlm.annual)
-print(syncexpl.annual)
+print(round(syncexpl.annual,3))
 
 #subset to wavelet components in annual timescale band
 syncexpl.annual <- syncexpl.annual[syncexpl.annual$timescales > min(annual) 
                                    & syncexpl.annual$timescales < max(annual),]
-print(syncexpl.annual)
+print(round(syncexpl.annual,3))
 
 #average across whole annual timescale band
 print(colMeans(syncexpl.annual))
@@ -128,12 +169,4 @@ mean(syncexpl.annual$crossterms)/mean(syncexpl.annual$syncexpl)
 #an assumption of the synchrony explained partitioning scheme.
 #We have considered values <10% of the synchrony explained acceptable.
 
-#output and plot predicted synchrony
-
-predsync.annual <- predsync(wlm.annual)
-
-
-plotmag(predsync.annual, zlims=c(0,max(Mod(wmf.wrack$values), na.rm=TRUE)))
-abline(h=log2(min(annual)), lwd=2)
-abline(h=log2(max(annual)), lwd=2)
 
