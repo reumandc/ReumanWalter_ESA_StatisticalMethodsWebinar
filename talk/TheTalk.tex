@@ -1008,7 +1008,8 @@ wlm.annual <- wsyn::wlm(datlist, tt, resp=1,
 #low nrand for fast computation, normally >=1000
 wlmtest.annual <- wsyn::wlmtest(wlm.annual, drop=2:4, 
   sigmethod = "fft", nrand=100)
-wlmtest.annual <- wsyn::bandtest(wlmtest.annual, annual)
+wlmtest.annual <- wsyn::bandtest(wlmtest.annual, 
+  annual)
 predsync.annual <- wsyn::predsync(wlm.annual)
 \end{verbatim}
 \end{exampleblock}
@@ -1085,5 +1086,17 @@ Note: output truncated for brevity.
 \item Selecting covariates for WLMs and model parsimony
 \end{itemize}
 \end{frame}}
+
+\begin{frame}
+\frametitle{Wrap-up and questions/discussion}
+\begin{itemize}
+\item A time and timescale-conscious approach to synchrony reveals overlooked patterns and strengthens inferences into mechanisms.
+\item The \texttt{wsyn} package provide a well-developed and cohesive suite of tools for implementing this perspective.
+\item We want people to use these tools and to develop them further! We routinely make ourselves available to help.
+\item Dan: reuman@ku.edu, Jon: jawalter@ucdavis.edu
+\end{itemize}
+
+
+\end{frame}
 
 \end{document}
