@@ -10,7 +10,7 @@ This repository can be used to reproduce the analyses behind the talk
 Jon Walter and Dan Reuman as part of the ESA/Ecological Forecasting Initiative 
 Webinar, 5/6/24, 12:00pm EDT. The idea behind this repo is to provide the 
 complete, reproducible workflow for all the analysis and simulations that went 
-into the talk, as well as the latex which produced the talk slides themselves.
+into the talk, as well as the latex which produced the talk slides themselves. A recording of the tlk itself can be found here https://www.youtube.com/watch?v=sxVHFwAkhdA.
 
 ## How to reproduce the workflow
 
